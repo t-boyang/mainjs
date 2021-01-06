@@ -158,6 +158,40 @@ function get_template_info(templateID) {
   });
 }
 
+function make_content_reuse(templateID,parentTemplateID,reuseType) {
+    const TemplateClass = Parse.Object.extend(TemplateClassName);
+    const query = new Parse.Query(TemplateClass);
+    query.equalTo("templateID", parentTemplateID);
+    query.find().then((results) => {
+        const templateResult = results[0];
+        const templateID = templateResult.get('templateID');
+        const templateFile = templateResult.get('templateFile');
+        const templateMetadata = templateResult.get('templateMetadata');
+        console.log("父ID为 ", templateID);
+        console.log("父文件url为 ", templateFile["_url"]);
+        console.log("父元数据为 ", templateMetadata);
+        const templateImageFile = templateResult.get("templateImageFile");
+        if (typeof (templateImageName) != undefined) {
+            console.log("模板图片url为 ", templateImageFile["_url"]);
+        }
+        save_template()
+    }, (error) => {
+        console.error('Error while fetching ParseObjects', error);
+    });
+}
+function delete_content_reuse(templateID,parentTemplateID,reuseType) {
+    
+}
+function update_content_reuse(templateID,parentTemplateID,reuseType) {
+    
+}
+function get_content_reuse(templateID) {
+    
+}
+
+
+
+
 // 测试例子代码
 initializeParse()
 //测试模板元数据例子
