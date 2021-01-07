@@ -190,8 +190,37 @@ function delete_content_reuse(templateID, parentTemplateID, reuseType, isDelete)
     delete_template_info(parentTemplateID);
   }
 }
-function update_content_reuse(templateID, parentTemplateID, reuseType) {
-
+function update_content_reuse(templateID, isChange, parentTemplateID, reuseType, templateMetadata, templateFileName, templateImageName) {
+  const TemplateClass = Parse.Object.extend(TemplateClassName);
+  const query = new Parse.Query(TemplateClass);
+  query.equalTo("templateID", templateID);
+  query.find().then((results) => {
+    const templateResult = results[0];
+    const templateIDBase = templateResult['id'];
+    query.get(templateIDBase).then((object) => {
+      const templateFile = fs.readFileSync(__dirname + "/" + templateFileName, "base64");
+      object.set('templateID', Number(templateID));
+      object.set('templateFile', new Parse.File(templateFileName, { base64: templateFile }));
+      object.set('templateMetadata', templateMetadata);
+      if (templateImageName != null) {
+        const templateImageFile = fs.readFileSync(__dirname + "/" + templateImageName, "base64");
+        object.set('templateImageFile', new Parse.File(templateImageName, { base64: templateImageFile }));
+      }
+      object.save().then((response) => {
+        console.log('Updated Project', response);
+        if (reuseType == "Homologous") {
+          change_template_info(parentTemplateID, templateMetadata, templateFileName, templateImageName);
+        }
+        if(reuseType == "reference" && isChange==true){
+          change_template_info(parentTemplateID, templateMetadata, templateFileName, templateImageName);
+        }
+      }, (error) => {
+        console.error('Error while updating Project', error);
+      });
+      });
+  }, (error) => {
+    console.error('Error while fetching ParseObjects', error);
+  });
 }
 
 function get_content_reuse(templateID) {
