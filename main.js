@@ -1,5 +1,8 @@
 var Parse = require('parse/node');
 var fs = require("fs");
+var request = require('request');
+var path = require("path");
+var urls = path.resolve('./');
 
 const parseID = "123456";
 //const parseKey = "a4nVyz0skRTy4yJsoNh8ygX0oBuH9EiRl1mh6xBA";
@@ -12,23 +15,39 @@ function initializeParse() {
   console.log("parse 连接成功")
 }//配置parse登录信息
 
-function make_template(object, templateID, templateFileName, templateMetadata, templateImageName) {
-  const templateFile = fs.readFileSync(templateFileName, "base64");
-  console.log("模板文件读取完成");
+function downloadFile(uri, filename) {
+  var stream = fs.createWriteStream(filename);
+  request(uri).pipe(stream);
+}
+
+function make_template(object, templateID, templateFileName, templateMetadata, templateImageName, sign) {
+  if (sign != true) {
+    const templateFile = fs.readFileSync(templateFileName, "base64");
+    console.log("模板文件读取完成");
+  }
 
   object.set('templateID', templateID);
-  object.set('templateFile', new Parse.File(templateFileName, { base64: templateFile }));
+  if (sign == true) {
+    object.set('templateFile', templateFileName);
+  } else {
+    object.set('templateFile', new Parse.File(templateFileName, { base64: templateFile }));
+  }
   object.set('templateMetadata', templateMetadata);
 
   if (templateImageName != null) {
-    const templateImageFile = fs.readFileSync(templateImageName, "base64");
-    console.log("模板图片读取完成");
-    object.set('templateImageFile', new Parse.File(templateImageName, { base64: templateImageFile }));
+    if (sign == true) {
+      object.set('templateImageFile', templateImageName);
+    } else {
+      const templateImageFile = fs.readFileSync(templateImageName, "base64");
+      console.log("模板图片读取完成");
+      object.set('templateImageFile', new Parse.File(templateImageName, { base64: templateImageFile }));
+    }
+
   }//上传模板图片
 
 } //编辑模板
 
-function save_template(templateID, templateMetadata, templateFileName, templateImageName) {
+function save_template(templateID, templateMetadata, templateFileName, templateImageName, sign) {
   const TemplateClass = Parse.Object.extend(TemplateClassName);
   const templateObject = new TemplateClass();
   const query = new Parse.Query(TemplateClass);
@@ -37,7 +56,7 @@ function save_template(templateID, templateMetadata, templateFileName, templateI
     if (typeof document !== 'undefined') document.write(`ParseObjects found: ${JSON.stringify(results)}`);
     const templateResult = results[0];
     if (typeof templateResult == 'undefined') {
-      make_template(templateObject, templateID, templateFileName, templateMetadata, templateImageName)
+      make_template(templateObject, templateID, templateFileName, templateMetadata, templateImageName, sign)
       templateObject.save().then(
         (result) => {
           // if (typeof document !== 'undefined') document.write(`ParseObject created: ${JSON.stringify(result)}`);
@@ -164,19 +183,24 @@ function make_content_reuse(templateID, parentTemplateID, reuseType) {
   query.equalTo("templateID", parentTemplateID);
   query.find().then((results) => {
     const templateResult = results[0];
-    const templateID = templateResult.get('templateID');
+    const newtemplateID = templateResult.get('templateID');
     const templateFile = templateResult.get('templateFile');
     const templateMetadata = templateResult.get('templateMetadata');
+    //const templateFileName = templateFile["_name"];
     templateMetadata["reuseType"] = reuseType;
     templateMetadata["parentID"] = parentTemplateID;
-    console.log("父ID为 ", templateID);
+    console.log("父ID为 ", newtemplateID);
     console.log("父文件url为 ", templateFile["_url"]);
+    // console.log("父文件url为 ", templateFile["_name"]);
     console.log("父元数据为 ", templateMetadata);
-    const templateImageFile = templateResult.get("templateImageFile");
+    const templateImageFiles = templateResult.get("templateImageFile");
     if (typeof (templateImageName) != undefined) {
-      console.log("模板图片url为 ", templateImageFile["_url"]);
+      console.log("模板图片url为 ", templateImageFiles["_url"]);
     }
-    save_template(templateID, templateMetadata, templateFileName, templateFile, templateImageFile);
+    //downloadFile(templateFile["_url"],templateFileName);
+    //console.log(templateFileName+'下载完毕');
+    save_template(templateID, templateMetadata, templateFile, templateImageFiles, true);
+    console.log("新模板id为 ", templateID);
   }, (error) => {
     console.error('Error while fetching ParseObjects', error);
   });
@@ -186,7 +210,7 @@ function delete_content_reuse(templateID, parentTemplateID, reuseType, isDelete)
   if (reuseType == "Homologous") {
     delete_template_info(parentTemplateID);
   }
-  if(reuseType == "reference" && isDelete==true){
+  if (reuseType == "reference" && isDelete == true) {
     delete_template_info(parentTemplateID);
   }
 }
@@ -211,13 +235,13 @@ function update_content_reuse(templateID, isChange, parentTemplateID, reuseType,
         if (reuseType == "Homologous") {
           change_template_info(parentTemplateID, templateMetadata, templateFileName, templateImageName);
         }
-        if(reuseType == "reference" && isChange==true){
+        if (reuseType == "reference" && isChange == true) {
           change_template_info(parentTemplateID, templateMetadata, templateFileName, templateImageName);
         }
       }, (error) => {
         console.error('Error while updating Project', error);
       });
-      });
+    });
   }, (error) => {
     console.error('Error while fetching ParseObjects', error);
   });
@@ -226,13 +250,14 @@ function update_content_reuse(templateID, isChange, parentTemplateID, reuseType,
 function get_content_reuse(templateID) {
   const TemplateClass = Parse.Object.extend(TemplateClassName);
   const query = new Parse.Query(TemplateClass);
-  query.equalTo("templateID", parentTemplateID);
+  query.equalTo("templateID", templateID);
   query.find().then((results) => {
     const templateResult = results[0];
     const templateID = templateResult.get('templateID');
     console.log("复用内容单元ID为 ", templateID);
     const templateMetadata = templateResult.get('templateMetadata');
-    console.log("复用内容单元的父节点ID为 ", templateID["parentID"]);
+    console.log("复用内容单元的类型为 ", templateMetadata["reuseType"]);
+    console.log("复用内容单元的父节点ID为 ", templateMetadata["parentID"]);
   }, (error) => {
     console.error('Error while fetching ParseObjects', error);
   });
@@ -251,32 +276,35 @@ var templateMetadata = {
   "componentID": 0
 }
 // 存入一个模板
-save_template(100, templateMetadata, "resume.xml", "photo.png");
-// 存入一个已经存在的模板 会报错
-save_template(100, templateMetadata, "resume.xml", "photo.png");
+//get_content_reuse(800);
+//update_content_reuse(700, false, 200, "Homologous", templateMetadata, "resume.xml", "photo.png");
+// save_template(200, templateMetadata, "resume.xml", "photo.png");
+//make_content_reuse(900, 200, "Homologous");
+// delete_content_reuse(700,200,"Homologous",false);
+// // 存入一个已经存在的模板 会报错
+// save_template(100, templateMetadata, "resume.xml", "photo.png");
 
-//查询一个不存在模板 会给出不存在的信息 
-get_template_info(1000000)
-//查询一个已经存在的模板
-get_template_info(100)
+// //查询一个不存在模板 会给出不存在的信息 
+// get_template_info(300)
+// //查询一个已经存在的模板
+// get_template_info(100)
 
-//新的模板元数据
-templateMetadata = {
-  "type": "full",
-  "description": "这是电烤箱使用",
-  "isDelete": false,
-  "createTime": "2020-12-15 20:33:39",
-  "parentID": 0,
-  "componentID": 0
-}
+// //新的模板元数据
+// templateMetadata = {
+//   "type": "full",
+//   "description": "这是电烤箱使用",
+//   "isDelete": false,
+//   "createTime": "2020-12-15 20:33:39",
+//   "parentID": 0,
+//   "componentID": 0
+// }
 
-//修改一个已经存在的模板
-change_template_info(100, templateMetadata, "resume.xml", "photo.png");
-// 修改一个不存在的模板 会给出不存在的信息
-change_template_info(10000000, templateMetadata, "resume.xml", "photo.png");
+// //修改一个已经存在的模板
+// change_template_info(100, templateMetadata, "resume.xml", "photo.png");
+// // 修改一个不存在的模板 会给出不存在的信息
+// change_template_info(10000000, templateMetadata, "resume.xml", "photo.png");
 
-//删除一个已经存在的模板
-get_template_info(100);
-// 删除一个不存在的模板 会给出不存在的信息
-delete_template_info(1000000);
-
+// //删除一个已经存在的模板
+// get_template_info(100);
+// // 删除一个不存在的模板 会给出不存在的信息
+// delete_template_info(1000000);
