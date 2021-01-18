@@ -1,5 +1,6 @@
 var Parse = require('parse/node');
 var underscore = require('underscore');
+// npm install  underscore --save
 
 const parseID = "123456";
 const serverURL = "http://localhost:1337/parse"
