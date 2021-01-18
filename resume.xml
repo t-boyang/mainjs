@@ -1,5 +1,2 @@
-<para id="123"  tags="gopro7, loop,model black">
-  This is a test para.
-  456456
-  sudo curl -X GET -H "X-Parse-Application-Id: 123456" http://localhost:1337/parse/classes/ToDo
+<para id="123" tags="black">
 </para>

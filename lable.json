@@ -1,0 +1,20 @@
+{
+	"car": [{
+			"price type": ["luxury cars"]
+		},
+		{
+			"boot type": {
+				"driverless car": ["semi-automatic driverless car", "fully-automatic driverless car"],
+				"manual  car": "simple manual  car"
+			}
+		},
+		{
+			"controlled lable": {
+				"id": 1,
+				"isDelete": "false",
+				"parent_id": 0,
+				"version": "1.0"
+			}
+		}
+    ]
+}
