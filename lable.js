@@ -35,7 +35,7 @@ function get_lable(lableID, lableUserName) {
         const lableResult = results[0];
         console.log("用户:" + lableResult.get('lableUserName') + "的个性化标签为: ");
         const lableBody = lableResult.get("lableBody")["car"];
-        for (var i = 0; i < lableBody.length-1; i++) {
+        for (var i = 0; i < lableBody.length - 1; i++) {
             console.log(underscore.values(lableBody[i]));
         }
     }, (error) => {

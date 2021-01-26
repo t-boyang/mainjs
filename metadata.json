@@ -1,0 +1,12 @@
+{
+    "id":1,
+    "type":"manage",
+    "name":"myMetaData",
+    "description":"这是一个元数据类型实例",
+    "needShowNote":true,
+    "screen":{
+        "screenType":"mobilePhone",
+        "screenLength":5.5,
+        "screenResolutionRatio":"1920*1080"
+    }
+}
