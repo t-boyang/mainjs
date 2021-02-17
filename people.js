@@ -9,7 +9,7 @@ function initializeParse() {
     Parse.serverURL = serverURL
 }
 
-function create_people(userName, userdataBody, userType) {
+exports.create_people = function create_people(userName, userdataBody, userType) {
     const userParseClass = Parse.Object.extend(userClassName);
     const userObject = new userParseClass();
     userObject.set('username', userName);
@@ -18,7 +18,7 @@ function create_people(userName, userdataBody, userType) {
     userObject.save().then(
         (result) => {
             console.log('用户文件 存储完成', result);
-            console.log('用户姓名为 ', userName);
+           // console.log('用户姓名为 ', userName);
         },
         (error) => {
             console.error('用户文件创建出错: ', error);
@@ -26,7 +26,7 @@ function create_people(userName, userdataBody, userType) {
     );
 }
 
-exports.world =  function get_people(userName) {
+exports.get_people =  function get_people(userName) {
     const userParseClass = Parse.Object.extend(userClassName);
     const query = new Parse.Query(userParseClass);
     query.equalTo("username", userName);
@@ -44,12 +44,12 @@ exports.world =  function get_people(userName) {
 
 //initializeParse()
 
-// var userExample = {
-//     "userId": "001",
-//     "loginType": "wechat",
-//     "username": "boyang",
-//     "password": "123456",
-//     "userType": "created_people"
-// }
+var userExample = {
+    "userId": "001",
+    "loginType": "wechat",
+    "username": "boyang",
+    "password": "123456",
+    "userType": "created_people"
+}
 // //create_people("boyang",userExample,"program admin");
 // get_people("boyang")
