@@ -26,7 +26,7 @@ function create_people(userName, userdataBody, userType) {
     );
 }
 
-function get_people(userName) {
+exports.world =  function get_people(userName) {
     const userParseClass = Parse.Object.extend(userClassName);
     const query = new Parse.Query(userParseClass);
     query.equalTo("username", userName);
@@ -42,13 +42,14 @@ function get_people(userName) {
     });
 }
 
-initializeParse()
-var userExample = {
-    "userId": "001",
-    "loginType": "wechat",
-    "username": "boyang",
-    "password": "123456",
-    "userType": "created_people"
-}
-//create_people("boyang",userExample,"program admin");
-get_people("boyang")
+//initializeParse()
+
+// var userExample = {
+//     "userId": "001",
+//     "loginType": "wechat",
+//     "username": "boyang",
+//     "password": "123456",
+//     "userType": "created_people"
+// }
+// //create_people("boyang",userExample,"program admin");
+// get_people("boyang")
