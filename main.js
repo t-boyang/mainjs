@@ -21,8 +21,9 @@ function downloadFile(uri, filename) {
 }
 
 function make_template(object, templateID, templateFileName, templateMetadata, templateImageName, sign) {
+  var templateFile=null;
   if (sign != true) {
-    const templateFile = fs.readFileSync(templateFileName, "base64");
+    templateFile = fs.readFileSync(templateFileName, "base64");
     console.log("模板文件读取完成");
   }
 
@@ -46,8 +47,7 @@ function make_template(object, templateID, templateFileName, templateMetadata, t
   }//上传模板图片
 
 } //编辑模板
-
-function save_template(templateID, templateMetadata, templateFileName, templateImageName, sign) {
+exports.save_template = function save_template(templateID, templateMetadata, templateFileName, templateImageName, sign) {
   const TemplateClass = Parse.Object.extend(TemplateClassName);
   const templateObject = new TemplateClass();
   const query = new Parse.Query(TemplateClass);
@@ -148,7 +148,7 @@ function change_template_info(templateID, templateMetadata, templateFileName, te
   });
 }//更新模板信息
 
-function get_template_info(templateID) {
+exports.get_template_info = function get_template_info(templateID) {
   const TemplateClass = Parse.Object.extend(TemplateClassName);
   const query = new Parse.Query(TemplateClass);
   query.equalTo("templateID", templateID);
@@ -264,28 +264,28 @@ function get_content_reuse(templateID) {
 }
 
 
-// 测试例子代码
-initializeParse()
-//测试模板元数据例子
-var templateMetadata = {
-  "type": "full",
-  "description": "这是汽车启动指南",
-  "isDelete": false,
-  "createTime": "2020-12-15 20:33:39",
-  "parentID": 0,
-  "componentID": 0
-}
+// // 测试例子代码
+// initializeParse()
+// //测试模板元数据例子
+// var templateMetadata = {
+//   "type": "full",
+//   "description": "这是汽车启动指南",
+//   "isDelete": false,
+//   "createTime": "2020-12-15 20:33:39",
+//   "parentID": 0,
+//   "componentID": 0
+// }
 // 存入一个模板
-//get_content_reuse(800);
+// get_content_reuse(800);
 //update_content_reuse(700, false, 200, "Homologous", templateMetadata, "resume.xml", "photo.png");
-// save_template(200, templateMetadata, "resume.xml", "photo.png");
+// save_template(888, templateMetadata, "resume.xml", "photo.png");
 //make_content_reuse(900, 200, "Homologous");
 // delete_content_reuse(700,200,"Homologous",false);
 // // 存入一个已经存在的模板 会报错
 // save_template(100, templateMetadata, "resume.xml", "photo.png");
 
 // //查询一个不存在模板 会给出不存在的信息 
-// get_template_info(300)
+// get_template_info(888);
 // //查询一个已经存在的模板
 // get_template_info(100)
 

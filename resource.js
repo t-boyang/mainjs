@@ -1,4 +1,6 @@
-var fn = require('./people.js');
+var people = require('./people.js');
+var label = require('./lable.js');
+var content = require('./main.js');
 var Parse = require('parse/node');
 var readlineSync = require('readline-sync');
 async = require("async");
@@ -36,34 +38,51 @@ var start = async function () {
         "password": passWord,
         "userType": "created_people"
     };
-    fn.create_people(userName, userExample, "program admin");
+    people.create_people(userName, userExample, "program admin");
     await sleep(500);
-    fn.get_people(userName);
+    people.get_people(userName);
+    console.log("请输入需要的标签:");
+    var tempLable = readlineSync.question('');
+    var i = 100;
+    var lableMetadata = {
+        tempLable: [{
+            "price type": ["luxury cars"]
+        },
+        {
+            "boot type": {
+                "driverless car": ["semi-automatic driverless car", "fully-automatic driverless car"],
+                "manual  car": "simple manual  car"
+            }
+        },
+        {
+            "controlled lable": {
+                "id": 1,
+                "isDelete": "false",
+                "parent_id": 0,
+                "version": "1.0"
+            }
+        }
+        ]
+    }
+    label.create_lable(i, userName, lableMetadata);
+    await sleep(500);
+    console.log("标签结果为:");
+    label.get_lable(i, userName);
+    console.log("输入一个内容复用单元ID号：");
+    var templateFileID = readlineSync.question('');
+    console.log("输入一个内容复用单元文件名：");
+    var templateFileName = readlineSync.question('');
+    var templateMetadata = {
+        "type": "full",
+        "description": "这是汽车启动指南",
+        "isDelete": false,
+        "createTime": "2020-12-15 20:33:39",
+        "parentID": 0,
+        "componentID": 0
+      }; 
+      content.save_template(Number(templateFileID), templateMetadata, templateFileName, "photo.png");
+      await sleep(500);
+      console.log("获取到的内容复用单元结果为："); 
+      content.get_template_info(Number(templateFileID));
 };
- 
 start();
-
-// async.series([a, b], function(error, result) {
-//     console.log("ok");
-// });
-// readSyn();
-// rl.on('line', function (line) {
-//     // TODO: 处理这一行输入 
-//     // ...
-//     username = line;
-//     const r2 = readline.createInterface({
-//         input: process.stdin,
-//         output: process.stdout
-//     })
-//     r2.on('line', function (line) {
-//         password = line;
-//         console.log(password);
-//     });
-//     rl.close();
-// });
-// var username = readline.createInterface(process.stdin, process.stdout);
-// console.log(username);
-
-// fn.u();
-// fn.world("boyang");
-// console.log(fn);

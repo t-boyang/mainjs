@@ -11,7 +11,7 @@ function initializeParse() {
     Parse.serverURL = serverURL
 }
 
-function create_lable(lableID, userName, lableBody) {
+exports.create_lable = function create_lable(lableID, userName, lableBody) {
     const lableClass = Parse.Object.extend(LableClassName);
     const lableObject = new lableClass();
     lableObject.set('lableID', lableID);
@@ -27,7 +27,7 @@ function create_lable(lableID, userName, lableBody) {
         }
     );
 }
-function get_lable(lableID, lableUserName) {
+exports.get_lable = function get_lable(lableID, lableUserName) {
     const lableClass = Parse.Object.extend(LableClassName);
     const query = new Parse.Query(lableClass);
     query.equalTo("lableUserName", lableUserName);
@@ -43,7 +43,7 @@ function get_lable(lableID, lableUserName) {
     });
 }
 
-// 测试标签例子代码
+//测试标签例子代码
 // initializeParse()
 // var lableMetadata = {
 //     "car": [{
